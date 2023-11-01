@@ -5,14 +5,19 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from transformers.generation.utils import GenerationConfig
 from count import count_everything
 import time
+from datetime import datetime
 import config
+
+from tensorboardX import SummaryWriter
+writer = SummaryWriter("/logs/baichuan",)
 
 st.set_page_config(page_title="AI助手")
 st.title("你的AI助手")
 
 model_path_13b = "/root/llm/baichuan-13B/Baichuan-13B-Chat"
+model_path_13b_2 = "/root/llm/Baichuan2-13B-Chat"
 model_path_7b = "/root/llm/Baichuan-7B"
-model_path = model_path_13b  # 可修改
+model_path = model_path_13b_2  # 可修改
 num_gpus = 1 #可修改
 current_device_map = config.device_map_13b # 可修改
 
@@ -53,7 +58,7 @@ def clear_chat_history():
 
 def init_chat_history():
     with st.chat_message("assistant", avatar='🤖'):
-        st.markdown("您好，我是徐建华，很高兴为您服务🥰")
+        st.markdown("您好，我是baichuan2，很高兴为您服务🥰")
 
     if "messages" in st.session_state:
         for message in st.session_state.messages:
@@ -84,9 +89,15 @@ def main():
             # response = model.chat(tokenizer, messages, stream=False)
             for response in model.chat(tokenizer, messages, stream=True):
                 placeholder.markdown(response)
+                torch.cuda.synchronize()
+                sample_time = time.time()
+                current_time = datetime.now().strftime("%H:%M:%S")
+                gpu_memory_used = torch.cuda.memory_allocated(0) / (1024 * 1024 * 1024)
+                writer.add_scalar("GPU显存消耗",gpu_memory_used,sample_time)
                 if torch.backends.mps.is_available():
                     torch.mps.empty_cache()
             
+            writer.flush()
             last_time = time.perf_counter()- start_time  # 时间单位s
             speed = counter.count_token(response,last_time)
             # placeholder.markdown(response)
@@ -100,3 +111,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    writer.close()

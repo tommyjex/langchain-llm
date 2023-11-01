@@ -20,6 +20,8 @@ def arxiv_search(query):
     for result in search.results():
         summary = {"title":result.title,"url":result.entry_id, "abstract":f"title:{result.title},Abstract: {result.summary}, URL: {result.entry_id}"}
 
+        result.download_pdf(dirpath='./papers',filename=result.title.replace(" ","_"))
+
     return summary
 
 
@@ -28,6 +30,10 @@ template = """
     你是一个研究员，为下面一段论文的摘要写总结,
     {abstract},
     总结：
+    1、
+    2、
+    3、
+    ...
     \n\n
     """
 prompt = PromptTemplate(template=template,input_variables=["abstract"])

@@ -1,6 +1,7 @@
 from transformers import AutoModelForCausalLM,AutoTokenizer
 from transformers.generation.utils import GenerationConfig
 import streamlit as st
+import torch
 
 
 @st.cache_resource #缓存model，多次用相同参数调用function时，直接从cache返回结果，不重复执行function    

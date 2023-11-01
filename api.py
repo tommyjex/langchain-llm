@@ -5,7 +5,8 @@ import uvicorn,json
 import torch
 
 
-model_path = "/root/llm/baichuan-13B/Baichuan-13B-Chat"
+# model_path = "/root/llm/baichuan-13B/Baichuan-13B-Chat"
+model_path = "/root/llm/Baichuan2-13B-Chat"
 
 tokenizer = AutoTokenizer.from_pretrained(model_path,trust_remote_code=True)
 model = AutoModelForCausalLM.from_pretrained(model_path,trust_remote_code=True,torch_dtype=torch.float16,device_map="auto")
